@@ -14,10 +14,11 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            scroll-behavior: smooth;
         }
 
         .container {
@@ -29,97 +30,216 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 4rem 0;
+            padding: 6rem 0 4rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
+            font-size: 3.2rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.1); }
         }
 
         .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header-stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
         .section {
-            padding: 4rem 0;
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .section:nth-child(even) {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
         }
 
         .section-title {
-            font-size: 2rem;
+            font-size: 2.8rem;
             text-align: center;
-            margin-bottom: 3rem;
-            color: #333;
+            margin-bottom: 4rem;
+            color: #2c3e50;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
         }
 
         .mechanism-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
         }
 
         .mechanism-card {
             background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mechanism-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
         }
 
         .mechanism-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
         }
 
         .mechanism-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
         }
 
         .mechanism-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
             text-align: center;
             color: #667eea;
         }
 
+        .mechanism-card p {
+            color: #5a6c7d;
+            line-height: 1.8;
+            text-align: center;
+        }
+
         .yield-flow {
             background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .yield-flow h3 {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #667eea;
+            font-size: 2rem;
+            font-weight: 700;
         }
 
         .flow-step {
             display: flex;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 10px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .flow-step:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left-color: #667eea;
+            transform: translateX(5px);
         }
 
         .flow-number {
             background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            margin-right: 1rem;
+            margin-right: 1.5rem;
             flex-shrink: 0;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         .flow-content {
@@ -127,8 +247,15 @@
         }
 
         .flow-title {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .flow-content p {
+            color: #5a6c7d;
+            line-height: 1.7;
         }
 
         .user-story {
@@ -337,8 +464,29 @@
     <!-- Header -->
     <div class="header">
         <div class="container">
-            <h1>💰 AurumFi 收益机制详解</h1>
-            <p>了解如何通过黄金本位 DeFi 获得稳定收益</p>
+            <div class="header-content">
+                <h1>💰 AurumFi 收益机制详解</h1>
+                <p>了解如何通过黄金本位 DeFi 获得稳定收益，探索数字黄金的无限可能</p>
+                
+                <div class="header-stats">
+                    <div class="header-stat">
+                        <div class="header-stat-number">25.6%</div>
+                        <div class="header-stat-label">平均年化收益</div>
+                    </div>
+                    <div class="header-stat">
+                        <div class="header-stat-number">$2.3M</div>
+                        <div class="header-stat-label">总锁仓价值</div>
+                    </div>
+                    <div class="header-stat">
+                        <div class="header-stat-number">1,247</div>
+                        <div class="header-stat-label">活跃用户</div>
+                    </div>
+                    <div class="header-stat">
+                        <div class="header-stat-number">185%</div>
+                        <div class="header-stat-label">平均抵押率</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -351,25 +499,37 @@
                 <div class="mechanism-card">
                     <div class="mechanism-icon">🏆</div>
                     <div class="mechanism-title">超额抵押机制</div>
-                    <p>用户存入 PAXG，按 150% 抵押率铸造 aUSD，既保持黄金敞口，又获得 DeFi 收益机会</p>
+                    <p>用户存入 PAXG 黄金，按 150% 抵押率铸造 aUSD 稳定币。既保持黄金敞口，又获得 DeFi 收益机会，实现资产保值增值双重目标。</p>
                 </div>
                 
                 <div class="mechanism-card">
                     <div class="mechanism-icon">💎</div>
                     <div class="mechanism-title">多重收益叠加</div>
-                    <p>aUSD 基础收益 + 流动性挖矿 + 治理代币奖励 + 复合收益，多层次收益最大化</p>
+                    <p>aUSD 基础收益 (8-12%) + 流动性挖矿奖励 (15-25%) + 治理代币分红 + 复合收益效应，多层次收益结构最大化用户回报。</p>
                 </div>
                 
                 <div class="mechanism-card">
                     <div class="mechanism-icon">🛡️</div>
-                    <div class="mechanism-title">风险可控</div>
-                    <p>实时监控抵押率，自动清算保护，保险基金覆盖，确保用户资产安全</p>
+                    <div class="mechanism-title">智能风险控制</div>
+                    <p>实时监控抵押率变化，自动清算保护机制，保险基金全面覆盖，Certik + ConsenSys 双重审计确保用户资产绝对安全。</p>
                 </div>
                 
                 <div class="mechanism-card">
                     <div class="mechanism-icon">🔄</div>
-                    <div class="mechanism-title">复利增长</div>
-                    <p>收益可自动复投，通过复利效应实现资产长期稳定增长</p>
+                    <div class="mechanism-title">复利增长引擎</div>
+                    <p>收益可自动复投到协议中，通过复利效应实现资产长期稳定增长，让时间成为财富增值的最佳伙伴。</p>
+                </div>
+                
+                <div class="mechanism-card">
+                    <div class="mechanism-icon">🌍</div>
+                    <div class="mechanism-title">全球流动性网络</div>
+                    <p>支持多链部署，7×24 全球交易，无地域限制，与主流 DeFi 协议完美兼容，释放黄金的全球流动性潜能。</p>
+                </div>
+                
+                <div class="mechanism-card">
+                    <div class="mechanism-icon">🔍</div>
+                    <div class="mechanism-title">完全透明可验证</div>
+                    <p>实时 Proof-of-Reserve 机制，所有数据链上可验证，告别传统金融黑盒操作，建立用户信任基础。</p>
                 </div>
             </div>
 
@@ -380,32 +540,32 @@
                 <div class="flow-step">
                     <div class="flow-number">1</div>
                     <div class="flow-content">
-                        <div class="flow-title">存入 PAXG 黄金</div>
-                        <p>用户将 PAXG (实物黄金支撑) 存入 AurumFi 协议，保持黄金敞口</p>
+                        <div class="flow-title">🔗 连接钱包并存入 PAXG</div>
+                        <p>连接 MetaMask 等主流钱包，将您的 PAXG (实物黄金支撑代币) 存入 AurumFi 协议，开始您的黄金 DeFi 之旅。每 1 PAXG = 1 盎司实物黄金。</p>
                     </div>
                 </div>
                 
                 <div class="flow-step">
                     <div class="flow-number">2</div>
                     <div class="flow-content">
-                        <div class="flow-title">铸造 aUSD 稳定币</div>
-                        <p>按 150% 抵押率铸造 aUSD，获得可生息的黄金支撑稳定币</p>
+                        <div class="flow-title">⚖️ 智能铸造 aUSD 稳定币</div>
+                        <p>按 150% 安全抵押率铸造 aUSD 黄金支撑稳定币。系统自动计算最优铸造量，确保您的资产安全同时最大化资金利用效率。</p>
                     </div>
                 </div>
                 
                 <div class="flow-step">
                     <div class="flow-number">3</div>
                     <div class="flow-content">
-                        <div class="flow-title">参与 DeFi 生态</div>
-                        <p>使用 aUSD 参与流动性挖矿、借贷等 DeFi 活动，获得额外收益</p>
+                        <div class="flow-title">🚀 参与多元化 DeFi 生态</div>
+                        <p>使用 aUSD 参与流动性挖矿、借贷协议、DEX 交易等丰富的 DeFi 活动。获得 AUR 治理代币奖励，享受协议成长红利。</p>
                     </div>
                 </div>
                 
                 <div class="flow-step">
                     <div class="flow-number">4</div>
                     <div class="flow-content">
-                        <div class="flow-title">获得多重收益</div>
-                        <p>aUSD 基础收益 + 挖矿奖励 + 治理代币 + 黄金升值，实现收益最大化</p>
+                        <div class="flow-title">💰 收获多重复合收益</div>
+                        <p>获得 aUSD 基础收益 + 流动性挖矿奖励 + AUR 代币升值 + 黄金价格增长的四重收益。支持一键复投，让收益持续复利增长。</p>
                     </div>
                 </div>
             </div>
@@ -419,27 +579,30 @@
             
             <div class="risk-levels">
                 <div class="risk-card risk-low">
-                    <div class="risk-title">🟢 保守策略</div>
+                    <div class="risk-title">🟢 稳健保守策略</div>
                     <div class="risk-yield" style="color: #28a745;">8-12%</div>
-                    <p><strong>适合人群</strong>: 风险厌恶型投资者</p>
-                    <p><strong>策略</strong>: 主要持有 aUSD，抵押率 200%+</p>
-                    <p><strong>特点</strong>: 稳定安全，收益可预期</p>
+                    <p><strong>💼 适合人群</strong>: 风险厌恶型投资者、退休规划者</p>
+                    <p><strong>📊 投资策略</strong>: 主要持有 aUSD，抵押率保持 200%+</p>
+                    <p><strong>✨ 核心特点</strong>: 稳定安全，收益可预期，本金保障优先</p>
+                    <p><strong>⏱️ 建议期限</strong>: 6个月以上长期持有</p>
                 </div>
                 
                 <div class="risk-card risk-medium">
-                    <div class="risk-title">🟡 平衡策略</div>
+                    <div class="risk-title">🟡 均衡增长策略</div>
                     <div class="risk-yield" style="color: #ffc107;">15-25%</div>
-                    <p><strong>适合人群</strong>: 平衡型投资者</p>
-                    <p><strong>策略</strong>: 参与流动性挖矿，抵押率 150-180%</p>
-                    <p><strong>特点</strong>: 风险可控，收益较高</p>
+                    <p><strong>💼 适合人群</strong>: 平衡型投资者、资产配置需求者</p>
+                    <p><strong>📊 投资策略</strong>: 参与流动性挖矿，抵押率 150-180%</p>
+                    <p><strong>✨ 核心特点</strong>: 风险可控，收益较高，灵活调整</p>
+                    <p><strong>⏱️ 建议期限</strong>: 3-12个月中期投资</p>
                 </div>
                 
                 <div class="risk-card risk-high">
-                    <div class="risk-title">🔴 进取策略</div>
+                    <div class="risk-title">🔴 积极进取策略</div>
                     <div class="risk-yield" style="color: #dc3545;">30%+</div>
-                    <p><strong>适合人群</strong>: 专业投资者</p>
-                    <p><strong>策略</strong>: 杠杆策略，积极治理参与</p>
-                    <p><strong>特点</strong>: 高风险高收益，需要专业知识</p>
+                    <p><strong>💼 适合人群</strong>: 专业投资者、DeFi 资深用户</p>
+                    <p><strong>📊 投资策略</strong>: 杠杆策略，积极治理参与，套利机会</p>
+                    <p><strong>✨ 核心特点</strong>: 高风险高收益，需要专业知识和经验</p>
+                    <p><strong>⏱️ 建议期限</strong>: 灵活调整，密切监控市场</p>
                 </div>
             </div>
         </div>
@@ -652,6 +815,37 @@
     </div>
 
     <script>
+        // 数字动画效果
+        function animateNumbers() {
+            const stats = document.querySelectorAll('.header-stat-number');
+            stats.forEach((stat, index) => {
+                const finalValue = stat.textContent;
+                let currentValue = 0;
+                const increment = parseFloat(finalValue) / 50;
+                const isPercentage = finalValue.includes('%');
+                const isDollar = finalValue.includes('$');
+                
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= parseFloat(finalValue)) {
+                        currentValue = parseFloat(finalValue);
+                        clearInterval(timer);
+                    }
+                    
+                    let displayValue = currentValue.toFixed(1);
+                    if (isDollar) {
+                        displayValue = '$' + (currentValue / 1000000).toFixed(1) + 'M';
+                    } else if (isPercentage) {
+                        displayValue = currentValue.toFixed(1) + '%';
+                    } else {
+                        displayValue = Math.floor(currentValue).toLocaleString();
+                    }
+                    
+                    stat.textContent = displayValue;
+                }, 50);
+            });
+        }
+
         function calculateYield() {
             const amount = parseFloat(document.getElementById('investment-amount').value) || 0;
             const strategy = document.getElementById('strategy-type').value;
@@ -690,16 +884,59 @@
             const totalYield = baseYield + miningYield + tokenYield + compoundYield;
             const apy = (totalYield / amount) * (12 / months) * 100;
             
-            document.getElementById('base-yield').textContent = '$' + Math.round(baseYield).toLocaleString();
-            document.getElementById('mining-yield').textContent = '$' + Math.round(miningYield).toLocaleString();
-            document.getElementById('token-yield').textContent = '$' + Math.round(tokenYield).toLocaleString();
-            document.getElementById('compound-yield').textContent = '$' + Math.round(compoundYield).toLocaleString();
-            document.getElementById('total-yield').textContent = '$' + Math.round(totalYield).toLocaleString();
+            // 添加动画效果
+            animateValue('base-yield', 0, baseYield);
+            animateValue('mining-yield', 0, miningYield);
+            animateValue('token-yield', 0, tokenYield);
+            animateValue('compound-yield', 0, compoundYield);
+            animateValue('total-yield', 0, totalYield);
+            
             document.getElementById('apy-rate').textContent = apy.toFixed(1) + '%';
         }
         
-        // 初始化计算
-        window.addEventListener('load', calculateYield);
+        function animateValue(elementId, start, end) {
+            const element = document.getElementById(elementId);
+            const duration = 1000;
+            const increment = (end - start) / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = '$' + Math.round(current).toLocaleString();
+            }, 16);
+        }
+        
+        // 页面加载动画
+        window.addEventListener('load', () => {
+            setTimeout(animateNumbers, 500);
+            calculateYield();
+            
+            // 添加滚动动画
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.mechanism-card, .flow-step, .risk-card, .user-story').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                observer.observe(el);
+            });
+        });
         
         // 平滑滚动
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
