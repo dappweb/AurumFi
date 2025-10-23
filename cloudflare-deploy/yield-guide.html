@@ -192,6 +192,255 @@
             text-align: center;
         }
 
+        /* 治理代币样式 */
+        .governance-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            padding: 4rem 2rem;
+            margin: 4rem 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .governance-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="gov-pattern" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23gov-pattern)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .governance-section > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .governance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .governance-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .governance-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .governance-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .governance-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #FFD700;
+        }
+
+        .governance-card p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.7;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .governance-stats {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .governance-stats .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .governance-stats .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .governance-stats .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .governance-stats .stat-value {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        /* 代币信息样式 */
+        .token-overview {
+            margin: 3rem 0;
+        }
+
+        .token-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .token-info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .token-info-card h4 {
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .info-list {
+            space-y: 0.75rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item span:first-child {
+            color: #5a6c7d;
+            font-weight: 500;
+        }
+
+        .info-item span:last-child {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        /* 治理提案样式 */
+        .governance-proposals {
+            margin: 4rem 0;
+        }
+
+        .proposals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .proposal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .proposal-id {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .proposal-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-active {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .proposal-title {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .proposal-description {
+            color: #5a6c7d;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .proposal-stats {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .vote-result {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .vote-result span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .vote-participation {
+            color: #5a6c7d;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
         .yield-flow {
             background: white;
             border-radius: 25px;
@@ -533,6 +782,77 @@
                 </div>
             </div>
 
+            <!-- 治理代币专区 -->
+            <div class="governance-section">
+                <h3 style="text-align: center; margin-bottom: 3rem; color: #667eea; font-size: 2.2rem; font-weight: 700;">🏛️ AUR 治理代币生态</h3>
+                
+                <div class="governance-grid">
+                    <div class="governance-card">
+                        <div class="governance-icon">🗳️</div>
+                        <div class="governance-title">去中心化治理</div>
+                        <p>AUR 持有者享有协议治理投票权，参与重大决策制定，包括费率调整、新功能上线、资金分配等关键议题。</p>
+                        <div class="governance-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">最小投票权重:</span>
+                                <span class="stat-value">1,000 AUR</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">提案门槛:</span>
+                                <span class="stat-value">10,000 AUR</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="governance-card">
+                        <div class="governance-icon">💰</div>
+                        <div class="governance-title">收益分红机制</div>
+                        <p>协议收入的 50% 用于 AUR 回购销毁，剩余 50% 分配给质押者。质押 AUR 可获得稳定的协议收入分红。</p>
+                        <div class="governance-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">当前质押 APY:</span>
+                                <span class="stat-value">18.5%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">质押锁定期:</span>
+                                <span class="stat-value">30 天</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="governance-card">
+                        <div class="governance-icon">🔥</div>
+                        <div class="governance-title">通缩销毁模型</div>
+                        <p>每月使用协议收入回购并销毁 AUR 代币，减少总供应量，为长期持有者创造价值增长空间。</p>
+                        <div class="governance-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">月销毁量:</span>
+                                <span class="stat-value">~50,000 AUR</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">总销毁率:</span>
+                                <span class="stat-value">2.5%/年</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="governance-card">
+                        <div class="governance-icon">🎁</div>
+                        <div class="governance-title">多重激励奖励</div>
+                        <p>除基础收益外，AUR 持有者还可获得流动性挖矿奖励、治理参与奖励、推荐奖励等多重激励。</p>
+                        <div class="governance-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">挖矿加成:</span>
+                                <span class="stat-value">+25%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">推荐奖励:</span>
+                                <span class="stat-value">10% 佣金</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 收益流程图 -->
             <div class="yield-flow">
                 <h3 style="text-align: center; margin-bottom: 2rem; color: #667eea;">📈 收益获得流程</h3>
@@ -608,7 +928,148 @@
         </div>
     </div>
 
-    <!-- 收益计算器 -->
+    <!-- 治理代币详细介绍 -->
+    <div class="section">
+        <div class="container">
+            <h2 class="section-title">🏛️ AUR 治理代币深度解析</h2>
+            
+            <div class="token-overview">
+                <div class="token-info-grid">
+                    <div class="token-info-card">
+                        <h4>📊 代币基本信息</h4>
+                        <div class="info-list">
+                            <div class="info-item">
+                                <span>代币名称:</span>
+                                <span>AurumFi Token (AUR)</span>
+                            </div>
+                            <div class="info-item">
+                                <span>总供应量:</span>
+                                <span>100,000,000 AUR</span>
+                            </div>
+                            <div class="info-item">
+                                <span>当前价格:</span>
+                                <span>$2.45</span>
+                            </div>
+                            <div class="info-item">
+                                <span>市值:</span>
+                                <span>$245M</span>
+                            </div>
+                            <div class="info-item">
+                                <span>流通供应:</span>
+                                <span>65,000,000 AUR</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="token-info-card">
+                        <h4>🔥 通缩机制</h4>
+                        <div class="info-list">
+                            <div class="info-item">
+                                <span>月销毁量:</span>
+                                <span>~50,000 AUR</span>
+                            </div>
+                            <div class="info-item">
+                                <span>年销毁率:</span>
+                                <span>2.5%</span>
+                            </div>
+                            <div class="info-item">
+                                <span>累计销毁:</span>
+                                <span>1,250,000 AUR</span>
+                            </div>
+                            <div class="info-item">
+                                <span>销毁价值:</span>
+                                <span>$3.06M</span>
+                            </div>
+                            <div class="info-item">
+                                <span>下次销毁:</span>
+                                <span>2024年3月1日</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="token-info-card">
+                        <h4>💰 质押收益</h4>
+                        <div class="info-list">
+                            <div class="info-item">
+                                <span>当前 APY:</span>
+                                <span>18.5%</span>
+                            </div>
+                            <div class="info-item">
+                                <span>质押总量:</span>
+                                <span>25,000,000 AUR</span>
+                            </div>
+                            <div class="info-item">
+                                <span>质押率:</span>
+                                <span>38.5%</span>
+                            </div>
+                            <div class="info-item">
+                                <span>锁定期:</span>
+                                <span>30 天</span>
+                            </div>
+                            <div class="info-item">
+                                <span>最小质押:</span>
+                                <span>100 AUR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 治理提案示例 -->
+            <div class="governance-proposals">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: #667eea; font-size: 1.8rem;">📋 近期治理提案</h3>
+                
+                <div class="proposals-grid">
+                    <div class="proposal-card">
+                        <div class="proposal-header">
+                            <div class="proposal-id">#AIP-001</div>
+                            <div class="proposal-status status-passed">已通过</div>
+                        </div>
+                        <h4 class="proposal-title">调整流动性挖矿奖励分配</h4>
+                        <p class="proposal-description">提议将流动性挖矿奖励从每日 10,000 AUR 增加到 15,000 AUR，以吸引更多流动性提供者。</p>
+                        <div class="proposal-stats">
+                            <div class="vote-result">
+                                <span>赞成: 85.6%</span>
+                                <span>反对: 14.4%</span>
+                            </div>
+                            <div class="vote-participation">参与率: 67.8%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="proposal-card">
+                        <div class="proposal-header">
+                            <div class="proposal-id">#AIP-002</div>
+                            <div class="proposal-status status-active">投票中</div>
+                        </div>
+                        <h4 class="proposal-title">新增 Arbitrum 链部署</h4>
+                        <p class="proposal-description">提议在 Arbitrum 网络部署 AurumFi 协议，扩展多链生态，降低用户交易成本。</p>
+                        <div class="proposal-stats">
+                            <div class="vote-result">
+                                <span>赞成: 72.3%</span>
+                                <span>反对: 27.7%</span>
+                            </div>
+                            <div class="vote-participation">剩余时间: 3天</div>
+                        </div>
+                    </div>
+                    
+                    <div class="proposal-card">
+                        <div class="proposal-header">
+                            <div class="proposal-id">#AIP-003</div>
+                            <div class="proposal-status status-pending">待投票</div>
+                        </div>
+                        <h4 class="proposal-title">引入保险基金机制</h4>
+                        <p class="proposal-description">建议设立协议保险基金，使用协议收入的 10% 建立风险缓冲池，增强用户资产安全保障。</p>
+                        <div class="proposal-stats">
+                            <div class="vote-result">
+                                <span>讨论期</span>
+                            </div>
+                            <div class="vote-participation">开始时间: 2024年2月20日</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="section">
         <div class="container">
             <h2 class="section-title">🧮 收益计算器</h2>
@@ -698,7 +1159,7 @@
                 <div class="story-content">
                     <p><strong>投资过程</strong>：小明购买了 $7,000 的 PAXG，在 AurumFi 铸造了 $4,667 aUSD，参与流动性挖矿获得 AUR 代币奖励。</p>
                     
-                    <p><strong>策略选择</strong>：采用平衡策略，70% 资金参与流动性挖矿，30% 保持稳定收益。</p>
+                    <p><strong>策略选择</strong>：采用平衡策略，70% 资金参与流动性挖矿，30% 保持稳定收益。同时质押获得的 1,000 AUR 代币获得额外收益。</p>
                 </div>
                 
                 <div class="story-results">
@@ -725,18 +1186,23 @@
                     </div>
                     
                     <div class="result-item">
+                        <span>AUR 质押收益:</span>
+                        <span class="result-value">$453 (1,000 AUR × 18.5%)</span>
+                    </div>
+                    
+                    <div class="result-item">
                         <span>复合收益:</span>
                         <span class="result-value">$200</span>
                     </div>
                     
                     <div class="result-item" style="border-top: 2px solid #28a745; padding-top: 0.5rem; font-weight: bold;">
                         <span>总收益:</span>
-                        <span class="result-value">$2,773 (39.6%)</span>
+                        <span class="result-value">$3,226 (46.1%)</span>
                     </div>
                 </div>
                 
                 <blockquote style="margin-top: 1rem; padding: 1rem; background: #f0f8ff; border-left: 4px solid #667eea; font-style: italic;">
-                    "太棒了！我不仅保持了黄金敞口，还获得了远超银行理财的收益。最重要的是，整个过程透明可查，我随时可以看到我的资产状况。"
+                    "太棒了！除了 aUSD 的收益，我还通过持有和质押 AUR 代币获得了额外的治理收益。参与协议治理让我感觉真正拥有了这个项目的一部分。"
                 </blockquote>
             </div>
 
@@ -811,6 +1277,7 @@
             <a href="/app.html" class="cta-button">立即开始投资</a>
             <a href="/liquidity-mining.html" class="cta-button">参与流动性挖矿</a>
             <a href="/calculator.html" class="cta-button">计算预期收益</a>
+            <a href="#governance" class="cta-button">参与协议治理</a>
         </div>
     </div>
 
@@ -916,26 +1383,26 @@
             calculateYield();
             
             // 添加滚动动画
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
+             const observerOptions = {
+                 threshold: 0.1,
+                 rootMargin: '0px 0px -50px 0px'
+             };
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, observerOptions);
+             const observer = new IntersectionObserver((entries) => {
+                 entries.forEach(entry => {
+                     if (entry.isIntersecting) {
+                         entry.target.style.opacity = '1';
+                         entry.target.style.transform = 'translateY(0)';
+                     }
+                 });
+             }, observerOptions);
 
-            document.querySelectorAll('.mechanism-card, .flow-step, .risk-card, .user-story').forEach(el => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(30px)';
-                el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
-                observer.observe(el);
-            });
+             document.querySelectorAll('.mechanism-card, .flow-step, .risk-card, .user-story, .governance-card, .token-info-card, .proposal-card').forEach(el => {
+                 el.style.opacity = '0';
+                 el.style.transform = 'translateY(30px)';
+                 el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                 observer.observe(el);
+             });
         });
         
         // 平滑滚动
