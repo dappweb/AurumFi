@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AurumFi 收益机制详解 - 如何获得黄金本位 DeFi 收益</title>
+    <meta name="description" content="了解 AurumFi 的收益机制原理，查看真实用户使用案例，学习如何通过黄金本位 DeFi 获得稳定收益">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .mechanism-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .mechanism-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .mechanism-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .mechanism-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .mechanism-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .yield-flow {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .flow-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .flow-content {
+            flex: 1;
+        }
+
+        .flow-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-story {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .story-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .story-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .story-info h3 {
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .story-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .story-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .story-results {
+            background: #f0f8ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .calculator-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .calc-input {
+            margin-bottom: 1rem;
+        }
+
+        .calc-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .calc-input input, .calc-input select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .calc-input input:focus, .calc-input select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calc-results {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .calc-result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .calc-result-item:last-child {
+            border-top: 2px solid #ddd;
+            padding-top: 1rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .risk-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .risk-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .risk-low {
+            border-top: 4px solid #28a745;
+        }
+
+        .risk-medium {
+            border-top: 4px solid #ffc107;
+        }
+
+        .risk-high {
+            border-top: 4px solid #dc3545;
+        }
+
+        .risk-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .risk-yield {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .mechanism-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flow-step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .flow-number {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <h1>💰 AurumFi 收益机制详解</h1>
+            <p>了解如何通过黄金本位 DeFi 获得稳定收益</p>
+        </div>
+    </div>
+
+    <!-- 收益机制原理 -->
+    <div class="section">
+        <div class="container">
+            <h2 class="section-title">🔍 收益获得原理</h2>
+            
+            <div class="mechanism-grid">
+                <div class="mechanism-card">
+                    <div class="mechanism-icon">🏆</div>
+                    <div class="mechanism-title">超额抵押机制</div>
+                    <p>用户存入 PAXG，按 150% 抵押率铸造 aUSD，既保持黄金敞口，又获得 DeFi 收益机会</p>
+                </div>
+                
+                <div class="mechanism-card">
+                    <div class="mechanism-icon">💎</div>
+                    <div class="mechanism-title">多重收益叠加</div>
+                    <p>aUSD 基础收益 + 流动性挖矿 + 治理代币奖励 + 复合收益，多层次收益最大化</p>
+                </div>
+                
+                <div class="mechanism-card">
+                    <div class="mechanism-icon">🛡️</div>
+                    <div class="mechanism-title">风险可控</div>
+                    <p>实时监控抵押率，自动清算保护，保险基金覆盖，确保用户资产安全</p>
+                </div>
+                
+                <div class="mechanism-card">
+                    <div class="mechanism-icon">🔄</div>
+                    <div class="mechanism-title">复利增长</div>
+                    <p>收益可自动复投，通过复利效应实现资产长期稳定增长</p>
+                </div>
+            </div>
+
+            <!-- 收益流程图 -->
+            <div class="yield-flow">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: #667eea;">📈 收益获得流程</h3>
+                
+                <div class="flow-step">
+                    <div class="flow-number">1</div>
+                    <div class="flow-content">
+                        <div class="flow-title">存入 PAXG 黄金</div>
+                        <p>用户将 PAXG (实物黄金支撑) 存入 AurumFi 协议，保持黄金敞口</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="flow-number">2</div>
+                    <div class="flow-content">
+                        <div class="flow-title">铸造 aUSD 稳定币</div>
+                        <p>按 150% 抵押率铸造 aUSD，获得可生息的黄金支撑稳定币</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="flow-number">3</div>
+                    <div class="flow-content">
+                        <div class="flow-title">参与 DeFi 生态</div>
+                        <p>使用 aUSD 参与流动性挖矿、借贷等 DeFi 活动，获得额外收益</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="flow-number">4</div>
+                    <div class="flow-content">
+                        <div class="flow-title">获得多重收益</div>
+                        <p>aUSD 基础收益 + 挖矿奖励 + 治理代币 + 黄金升值，实现收益最大化</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 风险收益等级 -->
+    <div class="section" style="background: white;">
+        <div class="container">
+            <h2 class="section-title">⚖️ 风险收益等级</h2>
+            
+            <div class="risk-levels">
+                <div class="risk-card risk-low">
+                    <div class="risk-title">🟢 保守策略</div>
+                    <div class="risk-yield" style="color: #28a745;">8-12%</div>
+                    <p><strong>适合人群</strong>: 风险厌恶型投资者</p>
+                    <p><strong>策略</strong>: 主要持有 aUSD，抵押率 200%+</p>
+                    <p><strong>特点</strong>: 稳定安全，收益可预期</p>
+                </div>
+                
+                <div class="risk-card risk-medium">
+                    <div class="risk-title">🟡 平衡策略</div>
+                    <div class="risk-yield" style="color: #ffc107;">15-25%</div>
+                    <p><strong>适合人群</strong>: 平衡型投资者</p>
+                    <p><strong>策略</strong>: 参与流动性挖矿，抵押率 150-180%</p>
+                    <p><strong>特点</strong>: 风险可控，收益较高</p>
+                </div>
+                
+                <div class="risk-card risk-high">
+                    <div class="risk-title">🔴 进取策略</div>
+                    <div class="risk-yield" style="color: #dc3545;">30%+</div>
+                    <p><strong>适合人群</strong>: 专业投资者</p>
+                    <p><strong>策略</strong>: 杠杆策略，积极治理参与</p>
+                    <p><strong>特点</strong>: 高风险高收益，需要专业知识</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 收益计算器 -->
+    <div class="section">
+        <div class="container">
+            <h2 class="section-title">🧮 收益计算器</h2>
+            
+            <div class="calculator-section">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="calc-input">
+                            <label for="investment-amount">投资金额 (USD)</label>
+                            <input type="number" id="investment-amount" value="10000" min="100" oninput="calculateYield()">
+                        </div>
+                        
+                        <div class="calc-input">
+                            <label for="strategy-type">投资策略</label>
+                            <select id="strategy-type" onchange="calculateYield()">
+                                <option value="conservative">保守策略 (8-12%)</option>
+                                <option value="balanced" selected>平衡策略 (15-25%)</option>
+                                <option value="aggressive">进取策略 (30%+)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="calc-input">
+                            <label for="time-period">投资期限</label>
+                            <select id="time-period" onchange="calculateYield()">
+                                <option value="1">1个月</option>
+                                <option value="3">3个月</option>
+                                <option value="6">6个月</option>
+                                <option value="12" selected>1年</option>
+                                <option value="24">2年</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="calc-results">
+                        <h4 style="margin-bottom: 1rem; color: #667eea;">预期收益分析</h4>
+                        
+                        <div class="calc-result-item">
+                            <span>aUSD 基础收益:</span>
+                            <span id="base-yield">$0</span>
+                        </div>
+                        
+                        <div class="calc-result-item">
+                            <span>流动性挖矿收益:</span>
+                            <span id="mining-yield">$0</span>
+                        </div>
+                        
+                        <div class="calc-result-item">
+                            <span>AUR 代币奖励:</span>
+                            <span id="token-yield">$0</span>
+                        </div>
+                        
+                        <div class="calc-result-item">
+                            <span>复合收益:</span>
+                            <span id="compound-yield">$0</span>
+                        </div>
+                        
+                        <div class="calc-result-item">
+                            <span>总预期收益:</span>
+                            <span id="total-yield">$0</span>
+                        </div>
+                        
+                        <div class="calc-result-item">
+                            <span>年化收益率:</span>
+                            <span id="apy-rate">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户故事 -->
+    <div class="section" style="background: white;">
+        <div class="container">
+            <h2 class="section-title">👥 真实用户案例</h2>
+            
+            <!-- 小明的故事 -->
+            <div class="user-story">
+                <div class="story-header">
+                    <div class="story-avatar">小明</div>
+                    <div class="story-info">
+                        <h3>小明 - DeFi 新手投资者</h3>
+                        <p>程序员，5万元积蓄，希望投资黄金对抗通胀</p>
+                    </div>
+                </div>
+                
+                <div class="story-content">
+                    <p><strong>投资过程</strong>：小明购买了 $7,000 的 PAXG，在 AurumFi 铸造了 $4,667 aUSD，参与流动性挖矿获得 AUR 代币奖励。</p>
+                    
+                    <p><strong>策略选择</strong>：采用平衡策略，70% 资金参与流动性挖矿，30% 保持稳定收益。</p>
+                </div>
+                
+                <div class="story-results">
+                    <h4 style="margin-bottom: 1rem;">📊 一年收益表现</h4>
+                    
+                    <div class="result-item">
+                        <span>初始投资:</span>
+                        <span class="result-value">$7,000</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>aUSD 基础收益:</span>
+                        <span class="result-value">$373</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>流动性挖矿收益:</span>
+                        <span class="result-value">$700</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>AUR 代币升值:</span>
+                        <span class="result-value">$1,500</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>复合收益:</span>
+                        <span class="result-value">$200</span>
+                    </div>
+                    
+                    <div class="result-item" style="border-top: 2px solid #28a745; padding-top: 0.5rem; font-weight: bold;">
+                        <span>总收益:</span>
+                        <span class="result-value">$2,773 (39.6%)</span>
+                    </div>
+                </div>
+                
+                <blockquote style="margin-top: 1rem; padding: 1rem; background: #f0f8ff; border-left: 4px solid #667eea; font-style: italic;">
+                    "太棒了！我不仅保持了黄金敞口，还获得了远超银行理财的收益。最重要的是，整个过程透明可查，我随时可以看到我的资产状况。"
+                </blockquote>
+            </div>
+
+            <!-- 李女士的故事 -->
+            <div class="user-story">
+                <div class="story-header">
+                    <div class="story-avatar">李女士</div>
+                    <div class="story-info">
+                        <h3>李女士 - 传统投资者</h3>
+                        <p>企业高管，50万元资产配置需求，注重稳健收益</p>
+                    </div>
+                </div>
+                
+                <div class="story-content">
+                    <p><strong>投资策略</strong>：通过私人银行了解 AurumFi，采用保守策略，分批投资 $200,000，选择较高抵押率确保安全。</p>
+                    
+                    <p><strong>资产配置</strong>：70% 稳定收益策略 + 30% 流动性挖矿，享受 VIP 客户服务。</p>
+                </div>
+                
+                <div class="story-results">
+                    <h4 style="margin-bottom: 1rem;">📊 六个月收益表现</h4>
+                    
+                    <div class="result-item">
+                        <span>投资金额:</span>
+                        <span class="result-value">$200,000</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>稳定收益 (70%):</span>
+                        <span class="result-value">$7,000</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>挖矿收益 (30%):</span>
+                        <span class="result-value">$6,000</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>AUR 代币收益:</span>
+                        <span class="result-value">$3,000</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>复合收益:</span>
+                        <span class="result-value">$1,200</span>
+                    </div>
+                    
+                    <div class="result-item" style="border-top: 2px solid #28a745; padding-top: 0.5rem; font-weight: bold;">
+                        <span>半年总收益:</span>
+                        <span class="result-value">$17,200 (8.6%)</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span>年化收益率:</span>
+                        <span class="result-value">17.2%</span>
+                    </div>
+                </div>
+                
+                <blockquote style="margin-top: 1rem; padding: 1rem; background: #f0f8ff; border-left: 4px solid #667eea; font-style: italic;">
+                    "作为传统投资者，我最看重的是安全和稳定。AurumFi 不仅给了我黄金的安全感，还提供了远超传统理财的收益。专业的服务团队让我很放心。"
+                </blockquote>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <div class="container">
+            <h2 style="margin-bottom: 1rem;">🚀 开始您的黄金 DeFi 之旅</h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem;">加入 AurumFi，让您的黄金资产在 DeFi 世界中自由流动并产生收益</p>
+            
+            <a href="/app.html" class="cta-button">立即开始投资</a>
+            <a href="/liquidity-mining.html" class="cta-button">参与流动性挖矿</a>
+            <a href="/calculator.html" class="cta-button">计算预期收益</a>
+        </div>
+    </div>
+
+    <script>
+        function calculateYield() {
+            const amount = parseFloat(document.getElementById('investment-amount').value) || 0;
+            const strategy = document.getElementById('strategy-type').value;
+            const months = parseInt(document.getElementById('time-period').value);
+            
+            let baseRate, miningRate, tokenMultiplier, compoundRate;
+            
+            switch(strategy) {
+                case 'conservative':
+                    baseRate = 0.10;
+                    miningRate = 0.02;
+                    tokenMultiplier = 0.5;
+                    compoundRate = 0.01;
+                    break;
+                case 'balanced':
+                    baseRate = 0.12;
+                    miningRate = 0.08;
+                    tokenMultiplier = 1.0;
+                    compoundRate = 0.03;
+                    break;
+                case 'aggressive':
+                    baseRate = 0.15;
+                    miningRate = 0.15;
+                    tokenMultiplier = 2.0;
+                    compoundRate = 0.05;
+                    break;
+            }
+            
+            const timeRatio = months / 12;
+            
+            const baseYield = amount * baseRate * timeRatio;
+            const miningYield = amount * miningRate * timeRatio;
+            const tokenYield = amount * 0.1 * tokenMultiplier * timeRatio;
+            const compoundYield = amount * compoundRate * timeRatio;
+            
+            const totalYield = baseYield + miningYield + tokenYield + compoundYield;
+            const apy = (totalYield / amount) * (12 / months) * 100;
+            
+            document.getElementById('base-yield').textContent = '$' + Math.round(baseYield).toLocaleString();
+            document.getElementById('mining-yield').textContent = '$' + Math.round(miningYield).toLocaleString();
+            document.getElementById('token-yield').textContent = '$' + Math.round(tokenYield).toLocaleString();
+            document.getElementById('compound-yield').textContent = '$' + Math.round(compoundYield).toLocaleString();
+            document.getElementById('total-yield').textContent = '$' + Math.round(totalYield).toLocaleString();
+            document.getElementById('apy-rate').textContent = apy.toFixed(1) + '%';
+        }
+        
+        // 初始化计算
+        window.addEventListener('load', calculateYield);
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
