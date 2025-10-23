@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AurumFi 盈利模式计算器</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-panel, .results-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .slider-container {
+            margin-top: 0.5rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .result-value.positive {
+            color: #28a745;
+        }
+
+        .result-value.negative {
+            color: #dc3545;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .scenario-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .scenario-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .scenario-metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .scenario-total {
+            border-top: 2px solid #eee;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .update-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .update-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 AurumFi 盈利模式计算器</h1>
+            <p>动态分析不同场景下的收入预测和盈利能力</p>
+        </div>
+
+        <div class="calculator-grid">
+            <!-- 输入参数面板 -->
+            <div class="input-panel">
+                <h3 class="panel-title">📊 关键参数设置</h3>
+                
+                <div class="input-group">
+                    <label for="tvl">总锁仓价值 (TVL) - 百万美元</label>
+                    <input type="number" id="tvl" value="10" min="1" max="1000">
+                    <div class="slider-container">
+                        <input type="range" id="tvl-slider" class="slider" min="1" max="100" value="10">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="monthly-turnover">月度资金周转率 (%)</label>
+                    <input type="number" id="monthly-turnover" value="30" min="10" max="100">
+                    <div class="slider-container">
+                        <input type="range" id="turnover-slider" class="slider" min="10" max="100" value="30">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="mint-fee">铸造费率 (%)</label>
+                    <input type="number" id="mint-fee" value="0.5" min="0.1" max="2" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="redeem-fee">赎回费率 (%)</label>
+                    <input type="number" id="redeem-fee" value="0.3" min="0.1" max="2" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="management-fee">流动性管理费 (年化%)</label>
+                    <input type="number" id="management-fee" value="2" min="0.5" max="5" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="institutional-clients">机构客户数量</label>
+                    <input type="number" id="institutional-clients" value="3" min="0" max="20">
+                </div>
+
+                <div class="input-group">
+                    <label for="avg-institutional-fee">平均机构年费 (万美元)</label>
+                    <input type="number" id="avg-institutional-fee" value="20" min="5" max="100">
+                </div>
+
+                <button class="update-btn" onclick="calculateRevenue()">🔄 更新计算结果</button>
+            </div>
+
+            <!-- 结果显示面板 -->
+            <div class="results-panel">
+                <h3 class="panel-title">💵 收入分析结果</h3>
+                
+                <div class="result-item">
+                    <span class="result-label">月度铸造赎回费</span>
+                    <span class="result-value" id="mint-redeem-revenue">$0</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">月度管理费收入</span>
+                    <span class="result-value" id="management-revenue">$0</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">月度机构服务费</span>
+                    <span class="result-value" id="institutional-revenue">$0</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">月度总收入</span>
+                    <span class="result-value positive" id="total-monthly-revenue">$0</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">年化总收入</span>
+                    <span class="result-value positive" id="annual-revenue">$0</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">预估运营成本</span>
+                    <span class="result-value negative" id="operating-costs">$0</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">年度净利润</span>
+                    <span class="result-value" id="net-profit">$0</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">利润率</span>
+                    <span class="result-value" id="profit-margin">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 收入构成图表 -->
+        <div class="chart-container">
+            <h3 class="panel-title">📈 收入构成分析</h3>
+            <canvas id="revenueChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- 增长预测图表 -->
+        <div class="chart-container">
+            <h3 class="panel-title">🚀 5年增长预测</h3>
+            <canvas id="growthChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- 情景分析 -->
+        <div class="scenarios-grid">
+            <div class="scenario-card">
+                <div class="scenario-title">🐻 保守情景</div>
+                <div class="scenario-metric">
+                    <span>TVL:</span>
+                    <span>$5M</span>
+                </div>
+                <div class="scenario-metric">
+                    <span>机构客户:</span>
+                    <span>2家</span>
+                </div>
+                <div class="scenario-metric">
+                    <span>年收入:</span>
+                    <span id="conservative-revenue">$0</span>
+                </div>
+                <div class="scenario-total">
+                    <div class="scenario-metric">
+                        <span>净利润:</span>
+                        <span id="conservative-profit">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-title">🎯 基准情景</div>
+                <div class="scenario-metric">
+                    <span>TVL:</span>
+                    <span>$10M</span>
+                </div>
+                <div class="scenario-metric">
+                    <span>机构客户:</span>
+                    <span>5家</span>
+                </div>
+                <div class="scenario-metric">
+                    <span>年收入:</span>
+                    <span id="base-revenue">$0</span>
+                </div>
+                <div class="scenario-total">
+                    <div class="scenario-metric">
+                        <span>净利润:</span>
+                        <span id="base-profit">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-title">🚀 乐观情景</div>
+                <div class="scenario-metric">
+                    <span>TVL:</span>
+                    <span>$25M</span>
+                </div>
+                <div class="scenario-metric">
+                    <span>机构客户:</span>
+                    <span>10家</span>
+                </div>
+                <div class="scenario-metric">
+                    <span>年收入:</span>
+                    <span id="optimistic-revenue">$0</span>
+                </div>
+                <div class="scenario-total">
+                    <div class="scenario-metric">
+                        <span>净利润:</span>
+                        <span id="optimistic-profit">$0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let revenueChart, growthChart;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            calculateRevenue();
+            setupSliders();
+        });
+
+        // 设置滑块联动
+        function setupSliders() {
+            const tvlSlider = document.getElementById('tvl-slider');
+            const tvlInput = document.getElementById('tvl');
+            const turnoverSlider = document.getElementById('turnover-slider');
+            const turnoverInput = document.getElementById('monthly-turnover');
+
+            tvlSlider.addEventListener('input', function() {
+                tvlInput.value = this.value;
+                calculateRevenue();
+            });
+
+            tvlInput.addEventListener('input', function() {
+                tvlSlider.value = this.value;
+                calculateRevenue();
+            });
+
+            turnoverSlider.addEventListener('input', function() {
+                turnoverInput.value = this.value;
+                calculateRevenue();
+            });
+
+            turnoverInput.addEventListener('input', function() {
+                turnoverSlider.value = this.value;
+                calculateRevenue();
+            });
+        }
+
+        // 计算收入
+        function calculateRevenue() {
+            // 获取输入参数
+            const tvl = parseFloat(document.getElementById('tvl').value) * 1000000; // 转换为美元
+            const monthlyTurnover = parseFloat(document.getElementById('monthly-turnover').value) / 100;
+            const mintFee = parseFloat(document.getElementById('mint-fee').value) / 100;
+            const redeemFee = parseFloat(document.getElementById('redeem-fee').value) / 100;
+            const managementFee = parseFloat(document.getElementById('management-fee').value) / 100;
+            const institutionalClients = parseInt(document.getElementById('institutional-clients').value);
+            const avgInstitutionalFee = parseFloat(document.getElementById('avg-institutional-fee').value) * 10000;
+
+            // 计算各项收入
+            const monthlyMintVolume = tvl * monthlyTurnover;
+            const monthlyRedeemVolume = tvl * monthlyTurnover * 0.8; // 假设赎回量为铸造量的80%
+            
+            const mintRedeemRevenue = (monthlyMintVolume * mintFee) + (monthlyRedeemVolume * redeemFee);
+            const managementRevenue = (tvl * managementFee) / 12; // 月度管理费
+            const institutionalRevenue = (institutionalClients * avgInstitutionalFee) / 12; // 月度机构费
+            
+            const totalMonthlyRevenue = mintRedeemRevenue + managementRevenue + institutionalRevenue;
+            const annualRevenue = totalMonthlyRevenue * 12;
+            
+            // 估算运营成本 (基础成本 + 变动成本)
+            const baseCosts = 3000000; // 300万基础成本
+            const variableCosts = annualRevenue * 0.55; // 55%变动成本率
+            const operatingCosts = baseCosts + variableCosts;
+            
+            const netProfit = annualRevenue - operatingCosts;
+            const profitMargin = annualRevenue > 0 ? (netProfit / annualRevenue) * 100 : 0;
+
+            // 更新显示
+            document.getElementById('mint-redeem-revenue').textContent = formatCurrency(mintRedeemRevenue);
+            document.getElementById('management-revenue').textContent = formatCurrency(managementRevenue);
+            document.getElementById('institutional-revenue').textContent = formatCurrency(institutionalRevenue);
+            document.getElementById('total-monthly-revenue').textContent = formatCurrency(totalMonthlyRevenue);
+            document.getElementById('annual-revenue').textContent = formatCurrency(annualRevenue);
+            document.getElementById('operating-costs').textContent = formatCurrency(operatingCosts);
+            document.getElementById('net-profit').textContent = formatCurrency(netProfit);
+            document.getElementById('profit-margin').textContent = profitMargin.toFixed(1) + '%';
+
+            // 更新净利润颜色
+            const netProfitElement = document.getElementById('net-profit');
+            const profitMarginElement = document.getElementById('profit-margin');
+            if (netProfit > 0) {
+                netProfitElement.className = 'result-value positive';
+                profitMarginElement.className = 'result-value positive';
+            } else {
+                netProfitElement.className = 'result-value negative';
+                profitMarginElement.className = 'result-value negative';
+            }
+
+            // 更新图表
+            updateRevenueChart(mintRedeemRevenue, managementRevenue, institutionalRevenue);
+            updateGrowthChart();
+            updateScenarios();
+        }
+
+        // 初始化图表
+        function initializeCharts() {
+            // 收入构成图表
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['铸造赎回费', '流动性管理费', '机构服务费', '其他收入'],
+                    datasets: [{
+                        data: [40, 25, 20, 15],
+                        backgroundColor: [
+                            '#667eea',
+                            '#764ba2',
+                            '#f093fb',
+                            '#4facfe'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // 增长预测图表
+            const growthCtx = document.getElementById('growthChart').getContext('2d');
+            growthChart = new Chart(growthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [{
+                        label: '收入 (百万美元)',
+                        data: [0.5, 2, 8, 20, 50],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '净利润 (百万美元)',
+                        data: [-2.8, -2.6, -0.4, 4, 16.5],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新收入构成图表
+        function updateRevenueChart(mintRedeem, management, institutional) {
+            const total = mintRedeem + management + institutional;
+            const other = total * 0.15; // 假设其他收入占15%
+            
+            revenueChart.data.datasets[0].data = [
+                (mintRedeem / total) * 100,
+                (management / total) * 100,
+                (institutional / total) * 100,
+                15
+            ];
+            revenueChart.update();
+        }
+
+        // 更新增长预测图表
+        function updateGrowthChart() {
+            const currentRevenue = parseFloat(document.getElementById('annual-revenue').textContent.replace(/[$,]/g, '')) / 1000000;
+            const currentProfit = parseFloat(document.getElementById('net-profit').textContent.replace(/[$,]/g, '')) / 1000000;
+            
+            // 基于当前数据推算未来增长
+            const revenueGrowth = [
+                currentRevenue,
+                currentRevenue * 2,
+                currentRevenue * 4,
+                currentRevenue * 8,
+                currentRevenue * 15
+            ];
+            
+            const profitGrowth = [
+                currentProfit,
+                currentProfit * 1.5,
+                currentProfit * 3,
+                currentProfit * 6,
+                currentProfit * 12
+            ];
+            
+            growthChart.data.datasets[0].data = revenueGrowth;
+            growthChart.data.datasets[1].data = profitGrowth;
+            growthChart.update();
+        }
+
+        // 更新情景分析
+        function updateScenarios() {
+            // 保守情景 (TVL: $5M, 2个机构客户)
+            const conservativeRevenue = calculateScenarioRevenue(5000000, 2, 100000);
+            const conservativeProfit = conservativeRevenue - 3500000;
+            document.getElementById('conservative-revenue').textContent = formatCurrency(conservativeRevenue);
+            document.getElementById('conservative-profit').textContent = formatCurrency(conservativeProfit);
+
+            // 基准情景 (TVL: $10M, 5个机构客户)
+            const baseRevenue = calculateScenarioRevenue(10000000, 5, 200000);
+            const baseProfit = baseRevenue - 4000000;
+            document.getElementById('base-revenue').textContent = formatCurrency(baseRevenue);
+            document.getElementById('base-profit').textContent = formatCurrency(baseProfit);
+
+            // 乐观情景 (TVL: $25M, 10个机构客户)
+            const optimisticRevenue = calculateScenarioRevenue(25000000, 10, 300000);
+            const optimisticProfit = optimisticRevenue - 5000000;
+            document.getElementById('optimistic-revenue').textContent = formatCurrency(optimisticRevenue);
+            document.getElementById('optimistic-profit').textContent = formatCurrency(optimisticProfit);
+        }
+
+        // 计算情景收入
+        function calculateScenarioRevenue(tvl, clients, avgFee) {
+            const monthlyTurnover = 0.3;
+            const mintFee = 0.005;
+            const redeemFee = 0.003;
+            const managementFee = 0.02;
+            
+            const monthlyMintVolume = tvl * monthlyTurnover;
+            const monthlyRedeemVolume = tvl * monthlyTurnover * 0.8;
+            
+            const mintRedeemRevenue = ((monthlyMintVolume * mintFee) + (monthlyRedeemVolume * redeemFee)) * 12;
+            const managementRevenue = tvl * managementFee;
+            const institutionalRevenue = clients * avgFee;
+            
+            return mintRedeemRevenue + managementRevenue + institutionalRevenue;
+        }
+
+        // 格式化货币
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // 实时更新
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calculateRevenue);
+        });
+    </script>
+</body>
+</html>

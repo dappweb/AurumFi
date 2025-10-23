@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AurumFi KPI 监控仪表板</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .last-update {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1e5e9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-title {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .kpi-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .change-positive {
+            color: #28a745;
+        }
+
+        .change-negative {
+            color: #dc3545;
+        }
+
+        .change-neutral {
+            color: #6c757d;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1e5e9;
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .time-filter {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .time-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .time-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .time-btn.active:hover {
+            background: #5a6fd8;
+        }
+
+        .alerts-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1e5e9;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .alert-high {
+            background: #fff5f5;
+            border-left-color: #e53e3e;
+        }
+
+        .alert-medium {
+            background: #fffbf0;
+            border-left-color: #dd6b20;
+        }
+
+        .alert-low {
+            background: #f0fff4;
+            border-left-color: #38a169;
+        }
+
+        .alert-icon {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .alert-time {
+            font-size: 0.8rem;
+            color: #999;
+            margin-left: auto;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .metric-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .refresh-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #218838;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .time-filter {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🏆 AurumFi KPI Dashboard</div>
+            <div class="last-update">
+                最后更新: <span id="lastUpdate">--</span>
+                <button class="refresh-btn" onclick="refreshData()">
+                    <span id="refreshText">刷新数据</span>
+                    <div class="loading hidden" id="loadingSpinner"></div>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 核心 KPI 卡片 -->
+        <div class="dashboard-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">总锁仓价值 (TVL)</div>
+                    <div class="kpi-status status-good">健康</div>
+                </div>
+                <div class="kpi-value" id="tvl-value">$2.34M</div>
+                <div class="kpi-change change-positive">
+                    ↗ +15.2% (7天) | 目标: $10M
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">月活跃用户 (MAU)</div>
+                    <div class="kpi-status status-good">增长</div>
+                </div>
+                <div class="kpi-value" id="mau-value">1,247</div>
+                <div class="kpi-change change-positive">
+                    ↗ +89 新用户 | 目标: 10K
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">aUSD 流通量</div>
+                    <div class="kpi-status status-good">稳定</div>
+                </div>
+                <div class="kpi-value" id="ausd-supply">1.82M</div>
+                <div class="kpi-change change-positive">
+                    ↗ +12.3% | 抵押率: 185%
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">24h 交易量</div>
+                    <div class="kpi-status status-warning">波动</div>
+                </div>
+                <div class="kpi-value" id="volume-24h">$456K</div>
+                <div class="kpi-change change-negative">
+                    ↘ -8.5% | 平均: $520K
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">协议收入</div>
+                    <div class="kpi-status status-good">增长</div>
+                </div>
+                <div class="kpi-value" id="protocol-revenue">$18.2K</div>
+                <div class="kpi-change change-positive">
+                    ↗ +25% (月度) | APR: 3.2%
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">用户留存率</div>
+                    <div class="kpi-status status-good">优秀</div>
+                </div>
+                <div class="kpi-value" id="retention-rate">67%</div>
+                <div class="kpi-change change-positive">
+                    ↗ +3% (30天) | 行业平均: 45%
+                </div>
+            </div>
+        </div>
+
+        <!-- TVL 趋势图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">TVL 增长趋势</div>
+                <div class="time-filter">
+                    <button class="time-btn" onclick="changeTimeframe('7d')">7天</button>
+                    <button class="time-btn active" onclick="changeTimeframe('30d')">30天</button>
+                    <button class="time-btn" onclick="changeTimeframe('90d')">90天</button>
+                </div>
+            </div>
+            <canvas id="tvlChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- 用户增长图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">用户增长分析</div>
+                <div class="time-filter">
+                    <button class="time-btn active" onclick="changeUserChart('daily')">日活</button>
+                    <button class="time-btn" onclick="changeUserChart('weekly')">周活</button>
+                    <button class="time-btn" onclick="changeUserChart('monthly')">月活</button>
+                </div>
+            </div>
+            <canvas id="userChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- 收入分析图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">协议收入构成</div>
+            </div>
+            <canvas id="revenueChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- 实时警报 -->
+        <div class="alerts-section">
+            <h3 style="margin-bottom: 1rem;">实时警报</h3>
+            <div id="alertsContainer">
+                <div class="alert-item alert-medium">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <div class="alert-title">24h 交易量下降</div>
+                        <div class="alert-description">交易量较昨日下降 8.5%，需关注市场动态</div>
+                    </div>
+                    <div class="alert-time">2分钟前</div>
+                </div>
+
+                <div class="alert-item alert-low">
+                    <div class="alert-icon">✅</div>
+                    <div class="alert-content">
+                        <div class="alert-title">新用户注册激增</div>
+                        <div class="alert-description">过去24小时新增89名用户，超出预期</div>
+                    </div>
+                    <div class="alert-time">15分钟前</div>
+                </div>
+
+                <div class="alert-item alert-low">
+                    <div class="alert-icon">📈</div>
+                    <div class="alert-content">
+                        <div class="alert-title">TVL 突破新高</div>
+                        <div class="alert-description">总锁仓价值达到 $2.34M，创历史新高</div>
+                    </div>
+                    <div class="alert-time">1小时前</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细指标 -->
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <div class="metric-label">平均交易金额</div>
+                <div class="metric-value">$2,847</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Gas 费用优化</div>
+                <div class="metric-value">-23%</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">清算事件</div>
+                <div class="metric-value">0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">系统正常运行时间</div>
+                <div class="metric-value">99.9%</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">社区成员</div>
+                <div class="metric-value">3,456</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">合作伙伴</div>
+                <div class="metric-value">8</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let tvlChart, userChart, revenueChart;
+        let currentTimeframe = '30d';
+        let currentUserChart = 'daily';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            updateLastUpdateTime();
+            setInterval(updateLastUpdateTime, 60000); // 每分钟更新时间
+            setInterval(refreshData, 300000); // 每5分钟自动刷新数据
+        });
+
+        // 初始化图表
+        function initCharts() {
+            initTVLChart();
+            initUserChart();
+            initRevenueChart();
+        }
+
+        // TVL 趋势图
+        function initTVLChart() {
+            const ctx = document.getElementById('tvlChart').getContext('2d');
+            
+            const data = {
+                labels: ['1/15', '1/20', '1/25', '1/30', '2/4', '2/9', '2/14'],
+                datasets: [{
+                    label: 'TVL ($M)',
+                    data: [0.5, 0.8, 1.2, 1.6, 1.9, 2.1, 2.34],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            };
+
+            tvlChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 用户增长图
+        function initUserChart() {
+            const ctx = document.getElementById('userChart').getContext('2d');
+            
+            const data = {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: '新用户',
+                    data: [156, 234, 189, 267],
+                    backgroundColor: '#28a745',
+                }, {
+                    label: '活跃用户',
+                    data: [445, 567, 678, 789],
+                    backgroundColor: '#17a2b8',
+                }]
+            };
+
+            userChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 收入构成图
+        function initRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            const data = {
+                labels: ['铸造费用', '赎回费用', '流动性挖矿', '治理奖励', '其他'],
+                datasets: [{
+                    data: [45, 25, 15, 10, 5],
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#f093fb',
+                        '#f5576c',
+                        '#4facfe'
+                    ]
+                }]
+            };
+
+            revenueChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+
+        // 切换时间范围
+        function changeTimeframe(timeframe) {
+            currentTimeframe = timeframe;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.time-filter .time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 模拟数据更新
+            updateTVLChart(timeframe);
+        }
+
+        // 更新 TVL 图表数据
+        function updateTVLChart(timeframe) {
+            let newData, newLabels;
+            
+            switch(timeframe) {
+                case '7d':
+                    newLabels = ['2/8', '2/9', '2/10', '2/11', '2/12', '2/13', '2/14'];
+                    newData = [2.1, 2.15, 2.18, 2.22, 2.28, 2.31, 2.34];
+                    break;
+                case '30d':
+                    newLabels = ['1/15', '1/20', '1/25', '1/30', '2/4', '2/9', '2/14'];
+                    newData = [0.5, 0.8, 1.2, 1.6, 1.9, 2.1, 2.34];
+                    break;
+                case '90d':
+                    newLabels = ['11/15', '12/1', '12/15', '1/1', '1/15', '2/1', '2/14'];
+                    newData = [0.1, 0.2, 0.3, 0.4, 0.5, 1.5, 2.34];
+                    break;
+            }
+
+            tvlChart.data.labels = newLabels;
+            tvlChart.data.datasets[0].data = newData;
+            tvlChart.update();
+        }
+
+        // 切换用户图表类型
+        function changeUserChart(type) {
+            currentUserChart = type;
+            
+            // 更新按钮状态
+            event.target.parentElement.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 更新图表数据
+            updateUserChartData(type);
+        }
+
+        // 更新用户图表数据
+        function updateUserChartData(type) {
+            let newLabels, newData1, newData2;
+            
+            switch(type) {
+                case 'daily':
+                    newLabels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                    newData1 = [45, 52, 38, 67, 73, 89, 56];
+                    newData2 = [234, 267, 245, 289, 312, 345, 298];
+                    userChart.data.datasets[0].label = '新用户';
+                    userChart.data.datasets[1].label = '日活用户';
+                    break;
+                case 'weekly':
+                    newLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    newData1 = [156, 234, 189, 267];
+                    newData2 = [445, 567, 678, 789];
+                    userChart.data.datasets[0].label = '新用户';
+                    userChart.data.datasets[1].label = '周活用户';
+                    break;
+                case 'monthly':
+                    newLabels = ['11月', '12月', '1月', '2月'];
+                    newData1 = [234, 456, 678, 892];
+                    newData2 = [567, 789, 1023, 1247];
+                    userChart.data.datasets[0].label = '新用户';
+                    userChart.data.datasets[1].label = '月活用户';
+                    break;
+            }
+
+            userChart.data.labels = newLabels;
+            userChart.data.datasets[0].data = newData1;
+            userChart.data.datasets[1].data = newData2;
+            userChart.update();
+        }
+
+        // 刷新数据
+        function refreshData() {
+            const refreshBtn = document.getElementById('refreshText');
+            const spinner = document.getElementById('loadingSpinner');
+            
+            refreshBtn.classList.add('hidden');
+            spinner.classList.remove('hidden');
+
+            // 模拟 API 调用
+            setTimeout(() => {
+                // 更新 KPI 数值
+                updateKPIValues();
+                
+                // 更新图表
+                updateCharts();
+                
+                // 更新时间
+                updateLastUpdateTime();
+                
+                refreshBtn.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                
+                // 显示成功提示
+                showNotification('数据已更新', 'success');
+            }, 2000);
+        }
+
+        // 更新 KPI 数值
+        function updateKPIValues() {
+            // 模拟数据变化
+            const tvl = (2.34 + (Math.random() - 0.5) * 0.1).toFixed(2);
+            const mau = Math.floor(1247 + (Math.random() - 0.5) * 50);
+            const ausd = (1.82 + (Math.random() - 0.5) * 0.1).toFixed(2);
+            const volume = Math.floor(456 + (Math.random() - 0.5) * 100);
+            const revenue = (18.2 + (Math.random() - 0.5) * 2).toFixed(1);
+            const retention = Math.floor(67 + (Math.random() - 0.5) * 5);
+
+            document.getElementById('tvl-value').textContent = `$${tvl}M`;
+            document.getElementById('mau-value').textContent = mau.toLocaleString();
+            document.getElementById('ausd-supply').textContent = `${ausd}M`;
+            document.getElementById('volume-24h').textContent = `$${volume}K`;
+            document.getElementById('protocol-revenue').textContent = `$${revenue}K`;
+            document.getElementById('retention-rate').textContent = `${retention}%`;
+        }
+
+        // 更新图表
+        function updateCharts() {
+            // 为图表添加新数据点
+            const newTVLValue = (2.34 + Math.random() * 0.1).toFixed(2);
+            
+            // 更新 TVL 图表
+            tvlChart.data.datasets[0].data.push(parseFloat(newTVLValue));
+            tvlChart.data.labels.push(new Date().toLocaleDateString('zh-CN', {month: 'numeric', day: 'numeric'}));
+            
+            // 保持最多7个数据点
+            if (tvlChart.data.datasets[0].data.length > 7) {
+                tvlChart.data.datasets[0].data.shift();
+                tvlChart.data.labels.shift();
+            }
+            
+            tvlChart.update();
+        }
+
+        // 更新最后更新时间
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastUpdate').textContent = timeString;
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? '#28a745' : '#17a2b8'};
+                color: white;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-size: 0.9rem;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // 添加 CSS 动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 模拟实时数据更新
+        setInterval(() => {
+            // 随机更新某个指标
+            const metrics = ['tvl-value', 'mau-value', 'volume-24h'];
+            const randomMetric = metrics[Math.floor(Math.random() * metrics.length)];
+            
+            // 添加闪烁效果表示数据更新
+            const element = document.getElementById(randomMetric);
+            element.style.transition = 'background-color 0.3s';
+            element.style.backgroundColor = '#fff3cd';
+            
+            setTimeout(() => {
+                element.style.backgroundColor = 'transparent';
+            }, 1000);
+        }, 30000); // 每30秒模拟一次数据更新
+    </script>
+</body>
+</html>

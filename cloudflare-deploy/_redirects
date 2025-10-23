@@ -1,0 +1,14 @@
+# Cloudflare Pages 重定向配置
+
+# 主要页面重定向
+/home /
+/mining /liquidity-mining.html
+/data /dashboard.html
+/profit /calculator.html
+/application /app.html
+
+# API 路由 (如果需要)
+/api/* https://api.aurumfi.com/:splat 200
+
+# 404 页面
+/* /index.html 404

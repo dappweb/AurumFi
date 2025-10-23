@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AurumFi App - aUSD 铸造和管理</title>
+    <meta name="description" content="使用 PAXG 铸造 aUSD，参与黄金本位 DeFi 协议">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .wallet-status {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .balance-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-row:last-child {
+            margin-bottom: 0;
+            font-weight: bold;
+            border-top: 1px solid #ddd;
+            padding-top: 0.5rem;
+        }
+
+        .action-button {
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .transaction-history {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .tx-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tx-item:last-child {
+            border-bottom: none;
+        }
+
+        .tx-type {
+            font-weight: 500;
+        }
+
+        .tx-amount {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .tx-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🏆 AurumFi App</div>
+            <div class="wallet-status" id="wallet-status">
+                <span id="wallet-text">连接钱包</span>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="user-paxg-balance">0.00</div>
+                <div class="stat-label">PAXG 余额</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="user-ausd-balance">0.00</div>
+                <div class="stat-label">aUSD 余额</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="user-collateral-ratio">0%</div>
+                <div class="stat-label">抵押率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="user-yield-earned">0.00</div>
+                <div class="stat-label">累计收益</div>
+            </div>
+        </div>
+
+        <!-- Main Actions -->
+        <div class="main-grid">
+            <!-- Mint aUSD -->
+            <div class="card">
+                <h2 class="card-title">铸造 aUSD</h2>
+                
+                <div class="alert" id="mint-alert" style="display: none;"></div>
+                
+                <div class="input-group">
+                    <label for="paxg-amount">PAXG 数量</label>
+                    <input type="number" id="paxg-amount" placeholder="0.00" step="0.01" oninput="calculateMint()">
+                </div>
+
+                <div class="balance-info">
+                    <div class="balance-row">
+                        <span>可铸造 aUSD:</span>
+                        <span id="mintable-ausd">0.00 aUSD</span>
+                    </div>
+                    <div class="balance-row">
+                        <span>抵押率:</span>
+                        <span id="mint-collateral-ratio">150%</span>
+                    </div>
+                    <div class="balance-row">
+                        <span>铸造费用 (0.5%):</span>
+                        <span id="mint-fee">0.00 aUSD</span>
+                    </div>
+                </div>
+
+                <button class="action-button" id="mint-button" onclick="mintAUSD()" disabled>
+                    连接钱包以铸造
+                </button>
+            </div>
+
+            <!-- Redeem PAXG -->
+            <div class="card">
+                <h2 class="card-title">赎回 PAXG</h2>
+                
+                <div class="alert" id="redeem-alert" style="display: none;"></div>
+                
+                <div class="input-group">
+                    <label for="ausd-amount">aUSD 数量</label>
+                    <input type="number" id="ausd-amount" placeholder="0.00" step="0.01" oninput="calculateRedeem()">
+                </div>
+
+                <div class="balance-info">
+                    <div class="balance-row">
+                        <span>可赎回 PAXG:</span>
+                        <span id="redeemable-paxg">0.00 PAXG</span>
+                    </div>
+                    <div class="balance-row">
+                        <span>赎回费用 (0.3%):</span>
+                        <span id="redeem-fee">0.00 PAXG</span>
+                    </div>
+                    <div class="balance-row">
+                        <span>实际到账:</span>
+                        <span id="redeem-net">0.00 PAXG</span>
+                    </div>
+                </div>
+
+                <button class="action-button" id="redeem-button" onclick="redeemPAXG()" disabled>
+                    连接钱包以赎回
+                </button>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="transaction-history">
+            <h2 class="card-title">交易历史</h2>
+            <div id="transaction-list">
+                <div class="tx-item">
+                    <div>
+                        <div class="tx-type">铸造 aUSD</div>
+                        <div class="tx-time">2024-02-14 10:30</div>
+                    </div>
+                    <div class="tx-amount">+1,000 aUSD</div>
+                </div>
+                <div class="tx-item">
+                    <div>
+                        <div class="tx-type">质押 PAXG</div>
+                        <div class="tx-time">2024-02-13 15:45</div>
+                    </div>
+                    <div class="tx-amount">-1.5 PAXG</div>
+                </div>
+                <div class="tx-item">
+                    <div>
+                        <div class="tx-type">收益领取</div>
+                        <div class="tx-time">2024-02-12 09:20</div>
+                    </div>
+                    <div class="tx-amount">+25.6 AUR</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let walletConnected = false;
+        let userAddress = '';
+        let paxgBalance = 0;
+        let ausdBalance = 0;
+
+        // 钱包连接
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_requestAccounts' 
+                    });
+                    
+                    walletConnected = true;
+                    userAddress = accounts[0];
+                    
+                    document.getElementById('wallet-text').textContent = 
+                        userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                    
+                    // 模拟获取余额
+                    paxgBalance = 5.25;
+                    ausdBalance = 2150.80;
+                    
+                    updateBalances();
+                    updateButtons();
+                    showAlert('mint-alert', '钱包连接成功！', 'success');
+                    
+                } catch (error) {
+                    showAlert('mint-alert', '钱包连接失败：' + error.message, 'error');
+                }
+            } else {
+                showAlert('mint-alert', '请安装 MetaMask 钱包！', 'error');
+            }
+        }
+
+        // 更新余额显示
+        function updateBalances() {
+            document.getElementById('user-paxg-balance').textContent = paxgBalance.toFixed(2);
+            document.getElementById('user-ausd-balance').textContent = ausdBalance.toFixed(2);
+            
+            const collateralRatio = ausdBalance > 0 ? ((paxgBalance * 2000) / ausdBalance * 100) : 0;
+            document.getElementById('user-collateral-ratio').textContent = collateralRatio.toFixed(0) + '%';
+            
+            document.getElementById('user-yield-earned').textContent = '156.78';
+        }
+
+        // 更新按钮状态
+        function updateButtons() {
+            const mintButton = document.getElementById('mint-button');
+            const redeemButton = document.getElementById('redeem-button');
+            
+            if (walletConnected) {
+                mintButton.textContent = '铸造 aUSD';
+                mintButton.disabled = false;
+                redeemButton.textContent = '赎回 PAXG';
+                redeemButton.disabled = false;
+            } else {
+                mintButton.textContent = '连接钱包以铸造';
+                mintButton.disabled = true;
+                redeemButton.textContent = '连接钱包以赎回';
+                redeemButton.disabled = true;
+            }
+        }
+
+        // 计算铸造
+        function calculateMint() {
+            const paxgAmount = parseFloat(document.getElementById('paxg-amount').value) || 0;
+            const paxgPrice = 2000; // 假设 PAXG 价格
+            const collateralRatio = 1.5; // 150% 抵押率
+            
+            const mintableAUSD = (paxgAmount * paxgPrice) / collateralRatio;
+            const mintFee = mintableAUSD * 0.005; // 0.5% 费用
+            
+            document.getElementById('mintable-ausd').textContent = mintableAUSD.toFixed(2) + ' aUSD';
+            document.getElementById('mint-fee').textContent = mintFee.toFixed(4) + ' aUSD';
+        }
+
+        // 计算赎回
+        function calculateRedeem() {
+            const ausdAmount = parseFloat(document.getElementById('ausd-amount').value) || 0;
+            const paxgPrice = 2000; // 假设 PAXG 价格
+            
+            const redeemablePAXG = ausdAmount / paxgPrice;
+            const redeemFee = redeemablePAXG * 0.003; // 0.3% 费用
+            const netPAXG = redeemablePAXG - redeemFee;
+            
+            document.getElementById('redeemable-paxg').textContent = redeemablePAXG.toFixed(4) + ' PAXG';
+            document.getElementById('redeem-fee').textContent = redeemFee.toFixed(6) + ' PAXG';
+            document.getElementById('redeem-net').textContent = netPAXG.toFixed(4) + ' PAXG';
+        }
+
+        // 铸造 aUSD
+        async function mintAUSD() {
+            const paxgAmount = parseFloat(document.getElementById('paxg-amount').value);
+            
+            if (!paxgAmount || paxgAmount <= 0) {
+                showAlert('mint-alert', '请输入有效的 PAXG 数量', 'error');
+                return;
+            }
+            
+            if (paxgAmount > paxgBalance) {
+                showAlert('mint-alert', 'PAXG 余额不足', 'error');
+                return;
+            }
+            
+            // 模拟交易
+            showAlert('mint-alert', '正在处理交易...', 'alert');
+            
+            setTimeout(() => {
+                const mintableAUSD = (paxgAmount * 2000) / 1.5;
+                ausdBalance += mintableAUSD;
+                paxgBalance -= paxgAmount;
+                
+                updateBalances();
+                document.getElementById('paxg-amount').value = '';
+                calculateMint();
+                
+                showAlert('mint-alert', `成功铸造 ${mintableAUSD.toFixed(2)} aUSD`, 'success');
+                addTransaction('铸造 aUSD', `+${mintableAUSD.toFixed(2)} aUSD`);
+            }, 2000);
+        }
+
+        // 赎回 PAXG
+        async function redeemPAXG() {
+            const ausdAmount = parseFloat(document.getElementById('ausd-amount').value);
+            
+            if (!ausdAmount || ausdAmount <= 0) {
+                showAlert('redeem-alert', '请输入有效的 aUSD 数量', 'error');
+                return;
+            }
+            
+            if (ausdAmount > ausdBalance) {
+                showAlert('redeem-alert', 'aUSD 余额不足', 'error');
+                return;
+            }
+            
+            // 模拟交易
+            showAlert('redeem-alert', '正在处理交易...', 'alert');
+            
+            setTimeout(() => {
+                const redeemablePAXG = ausdAmount / 2000;
+                const netPAXG = redeemablePAXG * 0.997; // 扣除 0.3% 费用
+                
+                paxgBalance += netPAXG;
+                ausdBalance -= ausdAmount;
+                
+                updateBalances();
+                document.getElementById('ausd-amount').value = '';
+                calculateRedeem();
+                
+                showAlert('redeem-alert', `成功赎回 ${netPAXG.toFixed(4)} PAXG`, 'success');
+                addTransaction('赎回 PAXG', `+${netPAXG.toFixed(4)} PAXG`);
+            }, 2000);
+        }
+
+        // 显示提示
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.textContent = message;
+            alert.className = 'alert ' + type;
+            alert.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // 添加交易记录
+        function addTransaction(type, amount) {
+            const txList = document.getElementById('transaction-list');
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN');
+            
+            const txItem = document.createElement('div');
+            txItem.className = 'tx-item';
+            txItem.innerHTML = `
+                <div>
+                    <div class="tx-type">${type}</div>
+                    <div class="tx-time">${timeString}</div>
+                </div>
+                <div class="tx-amount">${amount}</div>
+            `;
+            
+            txList.insertBefore(txItem, txList.firstChild);
+        }
+
+        // 钱包状态点击事件
+        document.getElementById('wallet-status').addEventListener('click', () => {
+            if (!walletConnected) {
+                connectWallet();
+            }
+        });
+
+        // 页面加载完成
+        window.addEventListener('load', () => {
+            updateButtons();
+            calculateMint();
+            calculateRedeem();
+        });
+
+        // 监听账户变化
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    walletConnected = false;
+                    userAddress = '';
+                    document.getElementById('wallet-text').textContent = '连接钱包';
+                    updateButtons();
+                } else {
+                    userAddress = accounts[0];
+                    document.getElementById('wallet-text').textContent = 
+                        userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

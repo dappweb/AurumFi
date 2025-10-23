@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# 主要页面
+Allow: /index.html
+Allow: /liquidity-mining.html
+Allow: /dashboard.html
+Allow: /calculator.html
+Allow: /app.html
+
+# 禁止访问的路径
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_*
+
+# 站点地图
+Sitemap: https://aurumfi.com/sitemap.xml
